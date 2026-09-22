@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Alert #{{ alert.alert_id }}{% endblock %}
+{% block content %}
+<h1>Alert #{{ alert.alert_id }}</h1>
+
+<section class="card">
+  <dl class="detail-list">
+    <dt>User</dt>
+    <dd><a href="{{ url_for('user_profile', user_id=user.user_id) }}">{{ user.full_name }} ({{ user.username }}) - {{ user.department }} / {{ user.role }}</a></dd>
+
+    <dt>Alert Type</dt>
+    <dd>{{ alert.alert_type }}</dd>
+
+    <dt>Risk Score</dt>
+    <dd><span class="risk-badge risk-{{ 'high' if alert.risk_score >= 75 else ('med' if alert.risk_score >= 40 else 'low') }}">{{ "%.1f"|format(alert.risk_score) }}</span></dd>
+
+    <dt>Description</dt>
+    <dd>{{ alert.description }}</dd>
+
+    <dt>Generated</dt>
+    <dd>{{ alert.date_generated.strftime("%Y-%m-%d %H:%M:%S") }}</dd>
+
+    <dt>Triggering Activity</dt>
+    <dd>
+      Log #{{ activity.log_id }} - {{ activity.activity_type }}
+      {% if activity.resource_accessed %} on <code>{{ activity.resource_accessed }}</code>{% endif %}
+      {% if activity.data_volume_mb %} ({{ "%.1f"|format(activity.data_volume_mb) }} MB){% endif %}
+      at {{ activity.timestamp.strftime("%Y-%m-%d %H:%M:%S") }} from {{ activity.ip_address or "unknown IP" }}
+    </dd>
+  </dl>
+
+  <form method="POST" action="{{ url_for('alert_detail', alert_id=alert.alert_id) }}" class="status-form">
+    <label for="status">Update status</label>
+    <select name="status" id="status">
+      <option value="open" {{ 'selected' if alert.status == 'open' }}>Open</option>
+      <option value="reviewed" {{ 'selected' if alert.status == 'reviewed' }}>Reviewed</option>
+      <option value="false_positive" {{ 'selected' if alert.status == 'false_positive' }}>False Positive</option>
+      <option value="escalated" {{ 'selected' if alert.status == 'escalated' }}>Escalated</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</section>
+
+<a href="{{ url_for('alerts') }}">&larr; Back to alerts</a>
+{% endblock %}

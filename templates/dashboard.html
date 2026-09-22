@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>Dashboard</h1>
+  <form method="POST" action="{{ url_for('run_detection') }}">
+    <button type="submit" class="btn btn-primary">Run Detection Cycle</button>
+  </form>
+</div>
+
+<section class="panel-grid">
+  <div class="panel">
+    <div class="panel-label">Total Users</div>
+    <div class="panel-value">{{ total_users }}</div>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Total Activities</div>
+    <div class="panel-value">{{ total_activities }}</div>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Open Alerts</div>
+    <div class="panel-value">{{ open_alerts }}</div>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Average Risk Score</div>
+    <div class="panel-value">{{ avg_risk_score }}</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Alerts Over Time (last 14 days)</h2>
+  <canvas id="alertsChart" height="90"></canvas>
+</section>
+
+<section class="card">
+  <h2>Recent High-Risk Alerts</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Alert</th>
+        <th>User</th>
+        <th>Type</th>
+        <th>Risk Score</th>
+        <th>Status</th>
+        <th>Generated</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for alert in recent_high_risk %}
+      <tr>
+        <td>#{{ alert.alert_id }}</td>
+        <td><a href="{{ url_for('user_profile', user_id=alert.user_id) }}">{{ alert.user.username }}</a></td>
+        <td>{{ alert.alert_type }}</td>
+        <td><span class="risk-badge risk-{{ 'high' if alert.risk_score >= 75 else ('med' if alert.risk_score >= 40 else 'low') }}">{{ "%.1f"|format(alert.risk_score) }}</span></td>
+        <td><span class="status-badge status-{{ alert.status }}">{{ alert.status }}</span></td>
+        <td>{{ alert.date_generated.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td><a href="{{ url_for('alert_detail', alert_id=alert.alert_id) }}">View</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="empty-row">No alerts yet. Import logs and run a detection cycle.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<script>
+  const ctx = document.getElementById('alertsChart');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ chart_labels|safe }},
+      datasets: [{
+        label: 'Alerts generated',
+        data: {{ chart_values|safe }},
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37,99,235,0.1)',
+        fill: true,
+        tension: 0.25,
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+</script>
+{% endblock %}

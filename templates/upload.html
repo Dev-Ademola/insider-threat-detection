@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Import Activity Logs{% endblock %}
+{% block content %}
+<h1>Import Activity Logs</h1>
+
+<section class="card">
+  <h2>Upload CSV</h2>
+  <p class="muted">
+    Columns expected: <code>username, full_name, department, role, activity_type,
+    resource_accessed, data_volume_mb, ip_address, timestamp</code>.
+    <code>activity_type</code> must be one of: login, file_access, download, transfer.
+  </p>
+  <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="upload_csv">
+    <input type="file" name="csv_file" accept=".csv" required>
+    <button type="submit" class="btn btn-primary">Import CSV</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Or Load Synthetic Demo Data</h2>
+  <p class="muted">
+    Populates the database with simulated activity for ~25 users over 45 days,
+    including a few seeded insider-threat patterns, per the prototype/simulation
+    scope described in the project report (Section 1.5).
+  </p>
+  <form method="POST" action="{{ url_for('upload') }}">
+    <input type="hidden" name="action" value="load_demo_data">
+    <button type="submit" class="btn btn-secondary">Load Demo Data</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Run Detection</h2>
+  <p class="muted">Recomputes baselines, runs the rule engine and anomaly detector, and generates alerts for all imported data.</p>
+  <form method="POST" action="{{ url_for('run_detection') }}">
+    <button type="submit" class="btn btn-primary">Run Detection Cycle</button>
+  </form>
+</section>
+{% endblock %}

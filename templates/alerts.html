@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Alerts{% endblock %}
+{% block content %}
+<h1>Alerts</h1>
+
+<form method="GET" action="{{ url_for('alerts') }}" class="filter-bar">
+  <label>Status
+    <select name="status">
+      <option value="" {{ 'selected' if not status_filter }}>All</option>
+      <option value="open" {{ 'selected' if status_filter == 'open' }}>Open</option>
+      <option value="reviewed" {{ 'selected' if status_filter == 'reviewed' }}>Reviewed</option>
+      <option value="false_positive" {{ 'selected' if status_filter == 'false_positive' }}>False Positive</option>
+      <option value="escalated" {{ 'selected' if status_filter == 'escalated' }}>Escalated</option>
+    </select>
+  </label>
+  <label>Min risk score
+    <input type="number" name="min_score" min="0" max="100" step="1" value="{{ min_score if min_score is not none else '' }}">
+  </label>
+  <button type="submit" class="btn btn-secondary">Filter</button>
+</form>
+
+<section class="card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Alert</th>
+        <th>User</th>
+        <th>Type</th>
+        <th>Risk Score</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Generated</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for alert in alerts %}
+      <tr>
+        <td>#{{ alert.alert_id }}</td>
+        <td><a href="{{ url_for('user_profile', user_id=alert.user_id) }}">{{ alert.user.username }}</a></td>
+        <td>{{ alert.alert_type }}</td>
+        <td><span class="risk-badge risk-{{ 'high' if alert.risk_score >= 75 else ('med' if alert.risk_score >= 40 else 'low') }}">{{ "%.1f"|format(alert.risk_score) }}</span></td>
+        <td class="truncate">{{ alert.description }}</td>
+        <td><span class="status-badge status-{{ alert.status }}">{{ alert.status }}</span></td>
+        <td>{{ alert.date_generated.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td><a href="{{ url_for('alert_detail', alert_id=alert.alert_id) }}">Investigate</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="empty-row">No alerts match this filter.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

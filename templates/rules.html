@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Detection Rules{% endblock %}
+{% block content %}
+<h1>Configure Detection Rules and Thresholds</h1>
+<p class="muted">These values are read by <code>rule_engine.py</code> and <code>risk_scoring.py</code> on every detection cycle.</p>
+
+<section class="card">
+  <form method="POST" action="{{ url_for('rules') }}" class="rules-form">
+    <label>After-hours window start (hour, 0-23)
+      <input type="number" name="login_start_hour" min="0" max="23" value="{{ config.login_start_hour }}" required>
+    </label>
+    <label>After-hours window end (hour, 0-23)
+      <input type="number" name="login_end_hour" min="0" max="23" value="{{ config.login_end_hour }}" required>
+    </label>
+    <label>Max allowed download volume (MB) - ORG_MAX_DOWNLOAD_MB
+      <input type="number" name="max_download_mb" min="0" step="1" value="{{ config.max_download_mb }}" required>
+    </label>
+    <label>Rule weight - RULE_WEIGHT
+      <input type="number" name="rule_weight" min="0" step="0.1" value="{{ config.rule_weight }}" required>
+    </label>
+    <label>ML weight - ML_WEIGHT
+      <input type="number" name="ml_weight" min="0" step="0.1" value="{{ config.ml_weight }}" required>
+    </label>
+    <label>High-risk alert threshold (0-100) - HIGH_RISK_THRESHOLD
+      <input type="number" name="high_risk_threshold" min="0" max="100" step="1" value="{{ config.high_risk_threshold }}" required>
+    </label>
+    <label>Restricted resources -&gt; authorized roles (JSON)
+      <textarea name="restricted_resources_json" rows="6">{{ config.restricted_resources_json }}</textarea>
+    </label>
+    <button type="submit" class="btn btn-primary">Save Rules</button>
+  </form>
+</section>
+{% endblock %}

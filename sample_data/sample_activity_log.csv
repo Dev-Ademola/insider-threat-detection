@@ -1,0 +1,10 @@
+username,full_name,department,role,activity_type,resource_accessed,data_volume_mb,ip_address,timestamp
+jdoe,Jane Doe,Finance,Analyst,login,,,10.0.1.12,2026-02-03 08:52:00
+jdoe,Jane Doe,Finance,Analyst,file_access,finance_reports,4.2,10.0.1.12,2026-02-03 09:10:00
+jdoe,Jane Doe,Finance,Analyst,download,finance_reports,18.6,10.0.1.12,2026-02-03 11:45:00
+bsmith,Bob Smith,Engineering,Software Engineer,login,,,10.0.2.31,2026-02-03 09:01:00
+bsmith,Bob Smith,Engineering,Software Engineer,file_access,source_code_repo,2.1,10.0.2.31,2026-02-03 09:20:00
+bsmith,Bob Smith,Engineering,Software Engineer,download,payroll_db,340.5,10.0.2.31,2026-02-03 23:47:00
+akoko,Amaka Okoro,HR,Recruiter,login,,,10.0.3.8,2026-02-03 08:40:00
+akoko,Amaka Okoro,HR,Recruiter,file_access,hr_portal,3.4,10.0.3.8,2026-02-03 10:05:00
+akoko,Amaka Okoro,HR,Recruiter,transfer,customer_records,712.0,10.0.3.8,2026-02-04 02:15:00

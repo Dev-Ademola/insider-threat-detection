@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<h1>Generate Reports</h1>
+<p class="muted">Downloadable/printable summary of alerts within a date range, per Section 3.9.2.</p>
+
+<section class="card">
+  <form method="POST" action="{{ url_for('reports') }}">
+    <label>Start date
+      <input type="date" name="start_date" required>
+    </label>
+    <label>End date
+      <input type="date" name="end_date" required>
+    </label>
+    <label>Format
+      <select name="format">
+        <option value="csv">CSV</option>
+        <option value="pdf">PDF</option>
+      </select>
+    </label>
+    <button type="submit" class="btn btn-primary">Download Report</button>
+  </form>
+</section>
+{% endblock %}

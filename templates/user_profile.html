@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ user.username }} - Risk Profile{% endblock %}
+{% block content %}
+<h1>{{ user.full_name }} ({{ user.username }})</h1>
+<p class="muted">{{ user.department }} / {{ user.role }} - monitored since {{ user.date_created.strftime("%Y-%m-%d") }}</p>
+
+<section class="panel-grid">
+  <div class="panel">
+    <div class="panel-label">Avg. Login Hour</div>
+    <div class="panel-value">{{ "%.1f"|format(baseline.avg_login_hour) if baseline and baseline.avg_login_hour is not none else "n/a" }}</div>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Avg. Daily Volume (MB)</div>
+    <div class="panel-value">{{ "%.1f"|format(baseline.avg_daily_data_volume_mb) if baseline and baseline.avg_daily_data_volume_mb is not none else "n/a" }}</div>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Std Dev Volume</div>
+    <div class="panel-value">{{ "%.1f"|format(baseline.std_dev_data_volume) if baseline and baseline.std_dev_data_volume is not none else "n/a" }}</div>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Open Alerts</div>
+    <div class="panel-value">{{ user_alerts|selectattr("status", "equalto", "open")|list|length }}</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Daily Data Volume Trend</h2>
+  <canvas id="trendChart" height="90"></canvas>
+</section>
+
+<section class="card">
+  <h2>Alert History</h2>
+  <table class="data-table">
+    <thead><tr><th>Alert</th><th>Type</th><th>Risk Score</th><th>Status</th><th>Generated</th><th></th></tr></thead>
+    <tbody>
+      {% for alert in user_alerts %}
+      <tr>
+        <td>#{{ alert.alert_id }}</td>
+        <td>{{ alert.alert_type }}</td>
+        <td><span class="risk-badge risk-{{ 'high' if alert.risk_score >= 75 else ('med' if alert.risk_score >= 40 else 'low') }}">{{ "%.1f"|format(alert.risk_score) }}</span></td>
+        <td><span class="status-badge status-{{ alert.status }}">{{ alert.status }}</span></td>
+        <td>{{ alert.date_generated.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td><a href="{{ url_for('alert_detail', alert_id=alert.alert_id) }}">View</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty-row">No alerts for this user.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<script>
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: {{ trend_labels|safe }},
+      datasets: [{
+        label: 'Data volume (MB/day)',
+        data: {{ trend_values|safe }},
+        borderColor: '#dc2626',
+        backgroundColor: 'rgba(220,38,38,0.08)',
+        fill: true,
+        tension: 0.2,
+      }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
+</script>
+{% endblock %}

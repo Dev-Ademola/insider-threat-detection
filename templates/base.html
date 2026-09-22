@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Insider Threat Detection System{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+  {% if current_user.is_authenticated %}
+  <header class="topbar">
+    <div class="topbar-brand">Insider Threat Detection System</div>
+    <nav class="topbar-nav">
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('alerts') }}">Alerts</a>
+      <a href="{{ url_for('upload') }}">Import Logs</a>
+      <a href="{{ url_for('rules') }}">Rules</a>
+      <a href="{{ url_for('reports') }}">Reports</a>
+    </nav>
+    <div class="topbar-user">
+      <span>{{ current_user.admin_username }}</span>
+      <a href="{{ url_for('logout') }}">Log out</a>
+    </div>
+  </header>
+  {% endif %}
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
